@@ -12,9 +12,13 @@ export default {
 
     theme: {
         extend: {
-            fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            colors: {
+                primary: {
+                    DEFAULT: '#0f172a', // Un azul marino corporativo (Slate 900)
+                    light: '#334155'
+                }
             },
+            // ... tipografías existentes de Breeze
         },
     },
 
