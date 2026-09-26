@@ -22,92 +22,95 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Register" />
+        <Head title="Create an account" />
 
-        <form @submit.prevent="submit">
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-slate-900">Create an account</h1>
+            <p class="text-sm text-slate-500 mt-1">Register to access the B2B operations portal.</p>
+        </div>
+
+        <form @submit.prevent="submit" class="space-y-4">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="Full name" class="text-slate-700" />
 
                 <TextInput
                     id="name"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1.5 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm"
                     v-model="form.name"
                     required
                     autofocus
                     autocomplete="name"
+                    placeholder="John Doe"
                 />
 
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+            <div>
+                <InputLabel for="email" value="Work email" class="text-slate-700" />
 
                 <TextInput
                     id="email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="mt-1.5 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm"
                     v-model="form.email"
                     required
                     autocomplete="username"
+                    placeholder="name@company.com"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+            <div>
+                <InputLabel for="password" value="Password" class="text-slate-700" />
 
                 <TextInput
                     id="password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1.5 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm"
                     v-model="form.password"
                     required
                     autocomplete="new-password"
+                    placeholder="Minimum 8 characters"
                 />
 
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
+            <div>
+                <InputLabel for="password_confirmation" value="Confirm password" class="text-slate-700" />
 
                 <TextInput
                     id="password_confirmation"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1.5 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm"
                     v-model="form.password_confirmation"
                     required
                     autocomplete="new-password"
+                    placeholder="Repeat your password"
                 />
 
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
+                <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Already registered?
-                </Link>
-
+            <div class="pt-2">
                 <PrimaryButton
-                    class="ms-4"
+                    class="w-full justify-center py-2.5 !bg-indigo-600 hover:!bg-indigo-500 focus:!ring-indigo-500 rounded-lg text-sm font-semibold shadow-sm transition-colors"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Register
+                    Create account
                 </PrimaryButton>
             </div>
+
+            <p class="text-center text-sm text-slate-500 pt-2 border-t border-slate-100">
+                Already registered?
+                <Link :href="route('login')" class="font-semibold text-indigo-600 hover:text-indigo-500">
+                    Sign in
+                </Link>
+            </p>
         </form>
     </GuestLayout>
 </template>
