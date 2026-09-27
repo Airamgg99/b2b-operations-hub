@@ -6,6 +6,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { notifyError } from '@/Utils/swal';
 
 defineProps({
     canResetPassword: {
@@ -25,6 +26,7 @@ const form = useForm({
 const submit = () => {
     form.post(route('login'), {
         onFinish: () => form.reset('password'),
+        onError: () => notifyError('Invalid credentials. Please check your email and password.'),
     });
 };
 </script>

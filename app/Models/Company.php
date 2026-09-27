@@ -12,11 +12,20 @@ class Company extends Model
 
     protected $fillable = ['name', 'vat_number', 'is_active'];
 
-    public function users() {
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
+
+    public function users()
+    {
         return $this->hasMany(User::class);
     }
 
-    public function subscription() {
+    public function subscription()
+    {
         return $this->hasOne(Subscription::class);
     }
 }
