@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,8 +20,13 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::patch('/companies/{id}/restore', [CompanyController::class, 'restore'])
         ->name('companies.restore');
-        
     Route::resource('companies', CompanyController::class)->only([
+        'index', 'store', 'update', 'destroy',
+    ]);
+
+    Route::patch('/users/{id}/restore', [UserController::class, 'restore'])
+        ->name('users.restore');
+    Route::resource('users', UserController::class)->only([
         'index', 'store', 'update', 'destroy',
     ]);
 
