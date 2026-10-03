@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/users/{id}/restore', [UserController::class, 'restore'])
         ->name('users.restore');
     Route::resource('users', UserController::class)->only([
+        'index', 'store', 'update', 'destroy',
+    ]);
+
+    Route::patch('/subscriptions/{id}/restore', [SubscriptionController::class, 'restore'])
+        ->name('subscriptions.restore');
+    Route::resource('subscriptions', SubscriptionController::class)->only([
         'index', 'store', 'update', 'destroy',
     ]);
 
