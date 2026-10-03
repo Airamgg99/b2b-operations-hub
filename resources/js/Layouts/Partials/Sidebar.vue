@@ -106,6 +106,24 @@ const emit = defineEmits(['toggleCollapse', 'closeMobile']);
                 </svg>
                 <span v-if="!isCollapsed" class="ml-3 truncate">Users</span>
             </Link>
+
+            <Link
+                :href="route('subscriptions.index')"
+                @click="$emit('close-mobile')"
+                :title="isCollapsed ? 'Subscriptions' : ''"
+                :class="[
+                    'flex items-center rounded-lg text-sm font-medium transition-colors',
+                    isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
+                    $page.url.startsWith('/subscriptions')
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                ]"
+            >
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                <span v-if="!isCollapsed" class="ml-3 truncate">Subscriptions</span>
+            </Link>
         </nav>
     </aside>
 </template>
