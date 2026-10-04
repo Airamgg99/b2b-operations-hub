@@ -13,8 +13,13 @@ use Throwable;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
+        // Si el usuario no tiene permisos de administración, lo redirigimos a su directorio de equipo
+        if (!$request->user()->hasAnyRole(['Super Admin', 'Company Admin'])) {
+            return redirect()->route('users.index');
+        }
+
         try {
             // KPIs de alto nivel
             $metrics = [

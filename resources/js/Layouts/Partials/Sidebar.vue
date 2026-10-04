@@ -1,5 +1,12 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const userRoles = page.props.auth?.user?.roles || [];
+const isSuperAdmin = userRoles.includes('Super Admin');
+const isCompanyAdmin = userRoles.includes('Company Admin');
+const canManageSystem = isSuperAdmin || isCompanyAdmin;
 
 defineProps({
     isCollapsed: {
@@ -56,6 +63,7 @@ const emit = defineEmits(['toggleCollapse', 'closeMobile']);
         <!-- Navigation Links -->
         <nav class="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
             <Link
+                v-if="canManageSystem"
                 :href="route('dashboard')"
                 :title="isCollapsed ? 'Dashboard' : ''"
                 :class="[
@@ -73,6 +81,7 @@ const emit = defineEmits(['toggleCollapse', 'closeMobile']);
             </Link>
 
             <Link
+                v-if="canManageSystem"
                 :href="route('companies.index')"
                 :title="isCollapsed ? 'Companies' : ''"
                 :class="[
@@ -108,6 +117,7 @@ const emit = defineEmits(['toggleCollapse', 'closeMobile']);
             </Link>
 
             <Link
+                v-if="canManageSystem"
                 :href="route('subscriptions.index')"
                 @click="$emit('close-mobile')"
                 :title="isCollapsed ? 'Subscriptions' : ''"
