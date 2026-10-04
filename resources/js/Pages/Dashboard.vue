@@ -13,7 +13,9 @@ const props = defineProps({
 });
 
 const page = usePage();
-const userName = page.props.auth.user.name.split(' ')[0]; // Primer nombre
+const userName = page.props.auth.user.name.split(' ')[0];
+const userRoles = page.props.auth.user.roles || [];
+const isSuperAdmin = userRoles.includes('Super Admin');
 
 // Date formatter
 const formatDate = (dateString) => {
@@ -121,7 +123,10 @@ const getDaysRemaining = (endsAt) => {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- Alerts Section (Spans 2 columns on large screens) -->
-            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+            <div :class="[
+                    isSuperAdmin ? 'lg:col-span-2' : 'lg:col-span-3',
+                    'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col'
+                ]">
                 <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
                     <h3 class="text-base font-bold text-slate-900">Operational Alerts</h3>
                     <span v-if="alerts.length > 0" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
@@ -185,7 +190,7 @@ const getDaysRemaining = (endsAt) => {
             </div>
 
             <!-- Quick Links / Next Steps -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+            <div v-if="isSuperAdmin" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                 <div class="px-5 py-4 border-b border-slate-200 bg-slate-50">
                     <h3 class="text-base font-bold text-slate-900">Quick Actions</h3>
                 </div>
