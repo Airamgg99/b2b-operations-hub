@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import Pagination from '@/Components/Pagination.vue';
 import Modal from '@/Components/Modal.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -31,6 +31,11 @@ const props = defineProps({
         }),
     },
 });
+
+const page = usePage();
+const userRoles = page.props.auth?.user?.roles || [];
+const isSuperAdmin = userRoles.includes('Super Admin');
+const isCompanyAdmin = userRoles.includes('Company Admin');
 
 // Search, Sorting & Trashed Filter State
 const search = ref(props.filters.search || '');
@@ -227,6 +232,7 @@ const executeRestore = () => {
             </div>
 
             <PrimaryButton
+                v-if="isSuperAdmin"
                 @click="openCreateModal"
                 class="!bg-indigo-600 hover:!bg-indigo-500 focus:!ring-indigo-500 rounded-lg text-sm font-semibold shadow-sm px-4 py-2.5 shrink-0 self-start sm:self-auto"
             >
@@ -500,6 +506,7 @@ const executeRestore = () => {
                                     <!-- Actions for Active Directory -->
                                     <template v-if="!company.deleted_at">
                                         <button
+                                            v-if="isSuperAdmin || isCompanyAdmin"
                                             @click="openEditModal(company)"
                                             type="button"
                                             title="Edit company"
@@ -511,6 +518,7 @@ const executeRestore = () => {
                                         </button>
 
                                         <button
+                                            v-if="isSuperAdmin"
                                             @click="confirmDelete(company)"
                                             type="button"
                                             title="Archive company"
