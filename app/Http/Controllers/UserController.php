@@ -31,7 +31,7 @@ class UserController extends Controller
             $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
             $users = User::query()
-                ->with(['company' => fn ($query) => $query->withTrashed()])
+                ->with(['company' => fn ($query) => $query->withTrashed(), 'roles'])
                 ->when($trashed === 'only', function ($query) {
                     $query->onlyTrashed();
                 })
@@ -68,6 +68,7 @@ class UserController extends Controller
                     'direction' => $direction,
                     'trashed' => $trashed,
                 ],
+                'availableRoles' => ['Company Admin', 'User'],
             ]);
         } catch (Throwable $e) {
             Log::error('Error loading users directory: ' . $e->getMessage());
@@ -80,14 +81,28 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         try {
+            // Escudo de seguridad Spatie
+            if (!$request->user()->hasAnyRole(['Super Admin', 'Company Admin'])) {
+                abort(403, 'Unauthorized action. Only administrators can manage users.');
+            }
+
             $validated = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-                'company_id' => ['nullable', 'exists:companies,id'],
-                'password' => ['required', 'confirmed', Password::defaults()],
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'company_id' => 'required|exists:companies,id',
+                'role' => 'required|in:Company Admin,User',
             ]);
 
-            User::create($validated);
+            // Guardamos el rol y lo eliminamos del array
+            $roleName = $validated['role'];
+            unset($validated['role']);
+
+            // Creamos el usuario sin el campo role
+            $user = User::create($validated);
+
+            // Asignamos el rol a través de Spatie
+            $user->assignRole($roleName);
 
             return redirect()->back()->with('success', 'User account created successfully.');
         } catch (ValidationException $e) {
@@ -103,25 +118,33 @@ class UserController extends Controller
     public function update(Request $request, User $user): RedirectResponse
     {
         try {
+            // Escudo de seguridad Spatie
+            if (!$request->user()->hasAnyRole(['Super Admin', 'Company Admin'])) {
+                abort(403, 'Unauthorized action. Only administrators can manage users.');
+            }
+
             $validated = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => [
-                    'required',
-                    'string',
-                    'lowercase',
-                    'email',
-                    'max:255',
-                    Rule::unique('users', 'email')->ignore($user->id),
-                ],
-                'company_id' => ['nullable', 'exists:companies,id'],
-                'password' => ['nullable', 'confirmed', Password::defaults()],
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+                'company_id' => 'required|exists:companies,id',
+                'role' => 'required|in:Company Admin,User',
+                'password' => 'nullable|string|min:8',
             ]);
 
+            // 1. Guardamos el rol en una variable y lo eliminamos del array
+            $roleName = $validated['role'];
+            unset($validated['role']);
+
+            // 2. Limpiamos la contraseña si viene vacía
             if (empty($validated['password'])) {
                 unset($validated['password']);
             }
 
+            // 3. Actualizamos al usuario (ahora no dará error SQL)
             $user->update($validated);
+
+            // 4. Sincronizamos con Spatie
+            $user->syncRoles($roleName);
 
             return redirect()->back()->with('success', 'User profile updated successfully.');
         } catch (ValidationException $e) {
@@ -137,6 +160,11 @@ class UserController extends Controller
     public function destroy(Request $request, User $user): RedirectResponse
     {
         try {
+            // Escudo de seguridad Spatie
+            if (!$request->user()->hasAnyRole(['Super Admin', 'Company Admin'])) {
+                abort(403, 'Unauthorized action. Only administrators can manage users.');
+            }
+
             if ($request->user()->id === $user->id) {
                 return redirect()->back()
                     ->with('error', 'Security restriction: You cannot archive your own active account.');
@@ -156,6 +184,11 @@ class UserController extends Controller
     public function restore(int $id): RedirectResponse
     {
         try {
+            // Escudo de seguridad Spatie
+            if (!$request->user()->hasAnyRole(['Super Admin', 'Company Admin'])) {
+                abort(403, 'Unauthorized action. Only administrators can manage users.');
+            }
+
             $user = User::onlyTrashed()->findOrFail($id);
             $user->restore();
 
