@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Mail\UserInvitation;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -81,7 +84,6 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         try {
-            // Escudo de seguridad Spatie
             if (!$request->user()->hasAnyRole(['Super Admin', 'Company Admin'])) {
                 abort(403, 'Unauthorized action. Only administrators can manage users.');
             }
@@ -89,29 +91,30 @@ class UserController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:8',
                 'company_id' => 'required|exists:companies,id',
                 'role' => 'required|in:Company Admin,User',
             ]);
 
-            // Guardamos el rol y lo eliminamos del array
             $roleName = $validated['role'];
             unset($validated['role']);
 
-            // Creamos el usuario sin el campo role
-            $user = User::create($validated);
+            // 1. Generar una contraseña temporal ultrasegura
+            $validated['password'] = Str::password(24);
 
-            // Asignamos el rol a través de Spatie
+            // 2. Crear el usuario y asignar el rol
+            $user = User::create($validated);
             $user->assignRole($roleName);
 
-            return redirect()->back()->with('success', 'User account created successfully.');
-        } catch (ValidationException $e) {
-            throw $e;
-        } catch (Throwable $e) {
-            Log::error('Error creating user: ' . $e->getMessage());
+            // 3. Generar token de reseteo
+            $token = app('auth.password.broker')->createToken($user);
 
-            return redirect()->back()
-                ->with('error', 'Database error while creating the user account. Please try again.');
+            // 4. Enviar el correo de invitación
+            Mail::to($user->email)->queue(new UserInvitation($user, $token));
+
+            return redirect()->back()->with('success', 'User invited successfully. An email has been sent.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Unable to invite the user.');
         }
     }
 
