@@ -146,8 +146,6 @@ const form = useForm({
     name: '',
     email: '',
     company_id: '',
-    password: '',
-    password_confirmation: '',
     role: 'User',
 });
 
@@ -769,38 +767,6 @@ const executeRestore = () => {
                     <p class="text-xs text-slate-500 mt-1">
                         Company Admins can manage other users and view billing details.
                     </p>
-                </div>
-
-                <div class="pt-2 border-t border-slate-100">
-                    <InputLabel
-                        for="password"
-                        :value="isEditing ? 'New Password (leave blank to keep current)' : 'Password'"
-                        class="text-slate-700"
-                    />
-                    <TextInput
-                        id="password"
-                        v-model="form.password"
-                        type="password"
-                        class="mt-1.5 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm"
-                        placeholder="Minimum 8 characters"
-                        :required="!isEditing"
-                        autocomplete="new-password"
-                    />
-                    <InputError class="mt-2" :message="form.errors.password" />
-                </div>
-
-                <div>
-                    <InputLabel for="password_confirmation" value="Confirm Password" class="text-slate-700" />
-                    <TextInput
-                        id="password_confirmation"
-                        v-model="form.password_confirmation"
-                        type="password"
-                        class="mt-1.5 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm"
-                        placeholder="Repeat password"
-                        :required="!isEditing || form.password.length > 0"
-                        autocomplete="new-password"
-                    />
-                    <InputError class="mt-2" :message="form.errors.password_confirmation" />
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
