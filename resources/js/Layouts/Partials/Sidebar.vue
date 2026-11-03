@@ -1,6 +1,7 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const page = usePage();
 const userRoles = page.props.auth?.user?.roles || [];
@@ -62,6 +63,24 @@ const emit = defineEmits(['toggleCollapse', 'closeMobile']);
 
         <!-- Navigation Links -->
         <nav class="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
+            <Link
+                v-if="canManageSystem"
+                :href="route('activity-logs.index')"
+                :title="isCollapsed ? 'Activity Logs' : ''"
+                :class="[
+                    'flex items-center rounded-lg text-sm font-medium transition-colors',
+                    isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
+                    $page.url.startsWith('/activity-logs')
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                ]"
+            >
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span v-if="!isCollapsed" class="ml-3 truncate">Activity Logs</span>
+            </Link>
+
             <Link
                 v-if="canManageSystem"
                 :href="route('dashboard')"
