@@ -25,6 +25,7 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
+        "@heroicons/vue": "^2.2.0",
         "sweetalert2": "^11.26.25"
     }
 }
